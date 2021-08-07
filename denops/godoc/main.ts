@@ -21,51 +21,47 @@ export async function main(denops: Denops): Promise<void> {
     bufname?: string,
   ): Promise<void> => {
     const bn = bufname ?? await fn.bufname(denops, bufnr);
-    await Promise.all([
-      (async () => {
-        const packageName = extractPath(bn);
-        const [godocExecutable, godocArgs] = await Promise.all([
-          internal.getGodocExecutable(denops),
-          internal.getGodocArgs(denops, packageName),
-        ]);
-        const p = Deno.run({
-          cmd: [
-            godocExecutable,
-            ...godocArgs,
-          ],
-          stdout: "piped",
-          stderr: "inherit",
-          stdin: "null",
-        });
-        try {
-          let linenr = 1;
-          const lineBuf: number[] = [];
-          const buf = new Uint8Array(65536);
-          const proc = async () => {
-            const lines: string[] = [];
-            let s: number;
-            while ((s = lineBuf.indexOf(0x0a)) >= 0) {
-              const line = lineBuf.splice(0, s + 1).slice(0, -1);
-              lines.push(new TextDecoder().decode(Uint8Array.from(line)));
-            }
-            await internal.setbufline(
-              denops,
-              bufnr,
-              linenr,
-              lines,
-            );
-            linenr += lines.length;
-          };
-          while (await p.stdout.read(buf) !== null) {
-            lineBuf.push(...buf);
-            await proc();
-          }
-          await proc();
-        } finally {
-          p.close();
-        }
-      })(),
+    const packageName = extractPath(bn);
+    const [godocExecutable, godocArgs] = await Promise.all([
+      internal.getGodocExecutable(denops),
+      internal.getGodocArgs(denops, packageName),
     ]);
+    const p = Deno.run({
+      cmd: [
+        godocExecutable,
+        ...godocArgs,
+      ],
+      stdout: "piped",
+      stderr: "inherit",
+      stdin: "null",
+    });
+    try {
+      let linenr = 1;
+      const lineBuf: number[] = [];
+      const buf = new Uint8Array(65536);
+      const proc = async () => {
+        const lines: string[] = [];
+        let s: number;
+        while ((s = lineBuf.indexOf(0x0a)) >= 0) {
+          const line = lineBuf.splice(0, s + 1).slice(0, -1);
+          lines.push(new TextDecoder().decode(Uint8Array.from(line)));
+        }
+        await internal.setbufline(
+          denops,
+          bufnr,
+          linenr,
+          lines,
+        );
+        linenr += lines.length;
+      };
+      while (await p.stdout.read(buf) !== null) {
+        lineBuf.push(...buf);
+        await proc();
+      }
+      await proc();
+    } finally {
+      p.close();
+    }
   };
 
   const setupAllBuffers = async (): Promise<void> => {
