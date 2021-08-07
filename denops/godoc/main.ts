@@ -42,17 +42,19 @@ export async function main(denops: Denops): Promise<void> {
           const lineBuf: number[] = [];
           const buf = new Uint8Array(65536);
           const proc = async () => {
+            const lines: string[] = [];
             let s: number;
             while ((s = lineBuf.indexOf(0x0a)) >= 0) {
               const line = lineBuf.splice(0, s + 1).slice(0, -1);
-              await internal.setbufline(
-                denops,
-                bufnr,
-                linenr,
-                new TextDecoder().decode(Uint8Array.from(line)),
-              );
-              linenr++;
+              lines.push(new TextDecoder().decode(Uint8Array.from(line)));
             }
+            await internal.setbufline(
+              denops,
+              bufnr,
+              linenr,
+              lines,
+            );
+            linenr += lines.length;
           };
           while (await p.stdout.read(buf) !== null) {
             lineBuf.push(...buf);

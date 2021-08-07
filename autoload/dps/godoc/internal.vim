@@ -29,7 +29,7 @@ endfunction
 
 " @param {Number} bufnr
 " @param {Number} linenr
-" @param {String} line
+" @param {String | String[]} line
 function! dps#godoc#internal#setbufline(bufnr, linenr, line) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
   call setbufvar(a:bufnr, '&readonly', 0)

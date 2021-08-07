@@ -42,7 +42,7 @@ export type Setbufline = (
   denops: Denops,
   bufnr: number,
   linenr: number,
-  line: string,
+  line: string | string[],
 ) => Promise<void>;
 export const setbufline = createCaller(
   "dps#godoc#internal#setbufline",
