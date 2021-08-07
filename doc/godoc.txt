@@ -1,0 +1,60 @@
+*godoc.txt*		Handy Godoc Viewer
+
+Author : Luma <world@luma.email>
+License: MIT <https://github.com/luma-dev/dps-godoc/blob/main/LICENSE>
+Powered by denops <https://vim-denops.github.io/denops-documentation/>
+
+==============================================================================
+CONTENTS						      *godoc-contents*
+
+INTRODUCTION						  |godoc-introduction|
+FUNCTIONS						     |godoc-functions|
+OPTIONS							       |godoc-options|
+
+==============================================================================
+INTRODUCTION						  *godoc-introduction*
+
+*godoc* is a handy Godoc viewer in vim/neovim.
+>
+	" Open viewer for net/http
+	:Godoc net/http
+	" Open viewer for the import-word under the cursor.
+	:Godoc
+	" Open split viewer for net/http
+	:split godoc://net/http
+<
+
+==============================================================================
+OPTIONS							       *godoc-options*
+
+							  *g:dps_godoc_keymap*
+@type    `0 | 1`
+@default `1`
+If set 0, skipping keymap setup.
+
+						      *g:dps_godoc_executable*
+@type    `string`
+@default `'go'`
+Used for execution.
+
+							    *g:dps_godoc_args*
+@type    `(string | null)[]`
+@default `['doc', '--', v:null]`
+Used for execution arguments. `null` is replaced by target package name.
+
+==============================================================================
+FUNCTIONS						     *godoc-functions*
+
+					     *dps#godoc#util#goimport_cword()*
+dps#godoc#util#goimport_cword()
+	@return `string`
+	Example:
+>
+	command! -bar -complete=customlist,go#complete#Package -nargs=? GodocSplit
+	    \ execute "split godoc://" . (
+	    \     empty(<q-args>) ? dps#godoc#util#goimport_cword() : <q-args>
+	    \ )
+<
+
+==============================================================================
+vim:tw=78:ts=8:noet:ft=help:norl
