@@ -5,5 +5,5 @@ command! -bar -complete=customlist,go#complete#Package -nargs=? Godoc
 
 augroup dps-godoc-internal
   autocmd BufReadCmd godoc://* call dps#godoc#internal#setup_buffer(bufnr())
-  autocmd SessionLoadPost godoc://* call denopdps#godoc#internal#setup_buffer(bufnr())
+  autocmd SessionLoadPost godoc://* call dps#godoc#internal#setup_buffer(bufnr())
 augroup END
